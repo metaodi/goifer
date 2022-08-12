@@ -1,11 +1,9 @@
 import goifer
+from pprint import pprint
 
-records = goifer.search('canton-zurich', query='Zurich')
+records = goifer.search('canton_zurich', index="behoerden", query='Gremiumtyp adj Fraktion sortBy name/sort.ascending')
 print('')
 
 for record in records:
-    # print fields from schema
-    print(record['reference'])
-    print(record['title'])
-    print(record['date'])
+    pprint(record)
     print('')

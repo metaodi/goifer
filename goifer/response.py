@@ -29,14 +29,14 @@ class SearchResponse(Response):
         try:
             return f"SearcheResponse(count={self.count})"
         except AttributeError:
-            return 'SearchRetrieveResponse(empty)'
+            return "SearchRetrieveResponse(empty)"
 
     def _parse_content(self, xml):
-        self.index = xml.attrib['indexName']
-        self.count = self.maybe_int(xml.attrib['numHits'])
-        self.query = xml.attrib['q']
-        self.maximum_records = self.maybe_int(xml.attrib['m'])
-        self.start_record = self.maybe_int(xml.attrib['s'])
+        self.index = xml.attrib["indexName"]
+        self.count = self.maybe_int(xml.attrib["numHits"])
+        self.query = xml.attrib["q"]
+        self.maximum_records = self.maybe_int(xml.attrib["m"])
+        self.start_record = self.maybe_int(xml.attrib["s"])
         self.next_start_record = self.start_record + self.maximum_records
         self._extract_records(xml)
 
@@ -89,10 +89,10 @@ class SearchResponse(Response):
     def _extract_records(self, xml):
         new_records = []
 
-        xml_recs = self.xmlparser.findall(xml, './sd:Hit')
+        xml_recs = self.xmlparser.findall(xml, "./sd:Hit")
         for xml_rec in xml_recs:
             record = defaultdict()
-            guid = xml_rec.attrib['Guid']
+            guid = xml_rec.attrib["Guid"]
 
             rec = self.xmlparser.find(xml_rec, f"./*[@OBJ_GUID = '{guid}']")
             record.update(self._tag_data(rec))
@@ -105,7 +105,9 @@ class SearchResponse(Response):
         if not elem:
             return None
         dict_namespaces = self._get_xmlns(elem)
-        record_data = self.xmlparser.todict(elem, xml_attribs=True, namespaces=dict_namespaces)
+        record_data = self.xmlparser.todict(
+            elem, xml_attribs=True, namespaces=dict_namespaces
+        )
         if not record_data:
             return None
 
@@ -114,11 +116,11 @@ class SearchResponse(Response):
         if len(record_data) == 1 and len(keys) > 0 and len(record_data[keys[0]]) > 0:
             record_data = record_data[keys[0]]
 
-        record_data.pop('xmlns', None)
+        record_data.pop("xmlns", None)
 
         def leaf_reducer(k1, k2):
             # only use key of leaf element
-            if k2 == 'text':
+            if k2 == "text":
                 return k1
             return k2
 
@@ -129,7 +131,6 @@ class SearchResponse(Response):
             # the dict will not be flattened
             pass
 
-
         record_data = self._clean_dict(record_data)
 
         return record_data
@@ -138,15 +139,15 @@ class SearchResponse(Response):
         dict_namespaces = {}
         elem_dict = flatten(self.xmlparser.todict(elem, xml_attribs=True))
         for k, v in elem_dict.items():
-            if 'xmlns' in k and v:
+            if "xmlns" in k and v:
                 dict_namespaces[v] = None
         return dict_namespaces
 
     def _clean_dict(self, records):
         # remove namespace and make everything lowercase
         def clean_name(key):
-            ns_pattern = re.compile('^.+:')
-            tag_name = ns_pattern.sub('', key)
+            ns_pattern = re.compile("^.+:")
+            tag_name = ns_pattern.sub("", key)
             return tag_name.lower()
 
         def convert_value(v):
@@ -158,9 +159,9 @@ class SearchResponse(Response):
                 pass
 
             # bool
-            if v.lower() == 'true':
+            if v.lower() == "true":
                 return True
-            elif v.lower() == 'false':
+            elif v.lower() == "false":
                 return False
 
             return v
@@ -170,12 +171,12 @@ class SearchResponse(Response):
         for k, v in records.items():
             clean_k = clean_name(k)
             if isinstance(v, dict):
-                if 'nil' in v and 'text' in v:
-                    if v['nil'] == 'true':
+                if "nil" in v and "text" in v:
+                    if v["nil"] == "true":
                         clean_rec[clean_k] = None
                         continue
-                    elif v['nil'] == 'false':
-                        clean_rec[clean_k] = convert_value(v['text'])
+                    elif v["nil"] == "false":
+                        clean_rec[clean_k] = convert_value(v["text"])
                         continue
                 clean_rec[clean_k] = self._clean_dict(v)
             elif isinstance(v, str):

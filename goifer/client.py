@@ -8,12 +8,7 @@ from . import errors
 from . import response
 
 
-__location__ = os.path.realpath(
-    os.path.join(
-        os.getcwd(),
-        os.path.dirname(__file__)
-    )
-)
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 class Client(object):
@@ -22,7 +17,7 @@ class Client(object):
         self.session = session
 
         namespaces = {
-            'sd': 'http://www.cmiag.ch/cdws/searchDetailResponse',
+            "sd": "http://www.cmiag.ch/cdws/searchDetailResponse",
         }
         self.xmlparser = muzzle.XMLParser(namespaces)
 
@@ -32,7 +27,7 @@ class Client(object):
             full_config = self._load_yaml_file(config)
         else:
             # if no config is provided, load the default config
-            path = os.path.join(__location__, '..', 'config.yml')
+            path = os.path.join(__location__, "..", "config.yml")
             full_config = self._load_yaml_file(path)
         try:
             self.config = full_config[instance]
@@ -40,31 +35,31 @@ class Client(object):
             raise errors.ConfigError(f"Instance '{instance}' not found in config: {e}")
 
     def _load_yaml_file(self, path):
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             return yaml.safe_load(f)
 
     def search(self, index, query, start_record=1):
         index_url = self._get_index_url(index)
         url = f"{index_url}/searchdetails"
         params = {
-            'q': query,
-            'l': 'de-CH',
-            'm': self.maximum_records,
+            "q": query,
+            "l": "de-CH",
+            "m": self.maximum_records,
         }
 
         data_loader = DataLoader(url, params, self.xmlparser, self.session)
         return response.SearchResponse(data_loader, self.xmlparser)
 
     def get_indexes(self):
-        return list(self.config['indexes'].keys())
+        return list(self.config["indexes"].keys())
 
     def _get_index_url(self, index):
         try:
-            index = self.config['indexes'][index]
+            index = self.config["indexes"][index]
 
-            base = self.config['api_base']
-            section = index.get('section', '')
-            path = index['path']
+            base = self.config["api_base"]
+            section = index.get("section", "")
+            path = index["path"]
             if section:
                 url = f"{base}/{section}{path}"
             else:
@@ -72,7 +67,6 @@ class Client(object):
             return url
         except KeyError as e:
             raise errors.ConfigError(f"Config error: {e}")
-
 
 
 class DataLoader(object):
@@ -86,7 +80,6 @@ class DataLoader(object):
         self.xmlparser = xmlparser
         self.response = None
 
-
     def load(self, **kwargs):
         self.params.update(kwargs)
         xml = self._get_content(self.url, self.params)
@@ -94,10 +87,7 @@ class DataLoader(object):
 
     def _get_content(self, url, params):
         try:
-            res = self.session.get(
-                url,
-                params=params
-            )
+            res = self.session.get(url, params=params)
             res.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise errors.GoiferError("HTTP error: %s" % e)

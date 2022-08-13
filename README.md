@@ -2,7 +2,7 @@
 [![Tests + Linting Python](https://github.com/metaodi/goifer/actions/workflows/lint_python.yml/badge.svg)](https://github.com/metaodi/goifer/actions/workflows/lint_python.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-![goifer logo](https://user-images.githubusercontent.com/538415/184494773-c5523f26-bb97-405d-8d29-24a916e5978c.jpeg)
+<img src="https://user-images.githubusercontent.com/538415/184494773-c5523f26-bb97-405d-8d29-24a916e5978c.jpeg" alt="goifer logo" width="300" />
 
 # goifer
 

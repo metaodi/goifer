@@ -33,10 +33,10 @@ See the [`examples` directory](https://github.com/metaodi/goifer/tree/master/exa
 ### `search`
 
 ```python
->>> import goi
->>> records = sruthi.searchretrieve('https://suche.staatsarchiv.djiktzh.ch/SRU/', query='Brettspiel')
+>>> import goifer
+>>> records = goifer.search('canton_zurich', index='Mitglieder' query='Marti')
 >>> print(records)
-SearchRetrieveResponse(sru_version='1.2',count=500,next_start_record=11)
+SearchResponse(count=17,next_start_record=11)
 >>> print(records.count)
 4
 ```

@@ -5,18 +5,18 @@ import yaml
 
 
 def print_header(s):
-    cprint(s, 'green', attrs=['bold'])
+    cprint(s, "green", attrs=["bold"])
 
 
 def print_title(s):
-    cprint(s, attrs=['bold'])
+    cprint(s, attrs=["bold"])
 
 
 def dump(d):
     print(yaml.dump(d, allow_unicode=True, default_flow_style=False))
 
 
-client = goifer.Client('canton_zurich')
+client = goifer.Client("canton_zurich")
 
 print_title("Indexes:")
 indexes = client.get_indexes()
@@ -25,10 +25,10 @@ dump(indexes)
 # loop over all indexes
 for index in indexes:
     print_header(index)
-    records = client.search(index, query='seq > 0')
-    print('')
+    records = client.search(index, query="seq > 0")
+    print("")
 
     # print first 3 records of each index
     for record in records[:3]:
         dump(record)
-        print('')
+        print("")

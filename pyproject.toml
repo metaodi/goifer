@@ -25,11 +25,16 @@ test = [
     "pytest-cov",
 ]
 dev = [
+    "black",
     "flit",
-    "termcolor",
     "pandas",
+    "termcolor",
 ]
 
 
 [project.urls]
 Home = "https://github.com/metaodi/goifer"
+
+[tool.black]
+line-length = 88
+extend-exclude = '(pyenv)'

@@ -1,5 +1,6 @@
 [![PyPI Version](https://img.shields.io/pypi/v/goifer)](https://pypi.org/project/goifer/)
 [![Tests + Linting Python](https://github.com/metaodi/goifer/actions/workflows/lint_python.yml/badge.svg)](https://github.com/metaodi/goifer/actions/workflows/lint_python.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # goifer
 

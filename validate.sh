@@ -8,6 +8,9 @@ function cleanup {
 
 trap "cleanup" EXIT
 
+# check with black
+black . --diff
+
 # Check PEP-8 code style and McCabe complexity
 flake8 . --count --show-source --statistics
 

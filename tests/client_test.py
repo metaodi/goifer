@@ -1,21 +1,32 @@
-from goifer_test import GoiferTestCase
-from goifer.client import GoiferClient
+import pytest
+from conftest import fixture_content
+from goifer.client import Client
 import responses
 
-SERVICE_URL = 'https://ws.parlament.ch/odata.svc'
 
+class TestClient:
+    @pytest.fixture
+    def wahlkreise(self):
+        return fixture_content("wahlkreise.xml")
 
-class TestClient(SwissParlTestCase):
     @responses.activate
-    def test_get_overview(self, metadata):
+    def test_get_indexes(self):
+        client = Client("canton_zurich")
+        indexes = client.get_indexes()
+        assert isinstance(indexes, list), "indexes is not a list"
+        assert len(indexes) == 11
+
+    @responses.activate
+    def test_search_wahlkreis(self, wahlkreise):
         responses.add(
             responses.GET,
-            f"{SERVICE_URL}/$metadata",
-            content_type='text/xml',
-            body=metadata,
-            status=200
+            "https://parlzhcdws.cmicloud.ch/parlzh2/cdws/Index/WAHLKREISE/searchdetails",
+            content_type="text/xml",
+            body=wahlkreise,
+            status=200,
         )
-        client = GoiferClient()
-        indexes = client.get_indexes()
-        assert isinstance(indexes, dict), "indexes is not a dict"
-        assert len(indexes) == 44
+        client = Client("canton_zurich")
+        results = client.search("Wahlkreise", "seq > 0")
+        wahlkreis = results[0]
+
+        assert wahlkreis["name"] == "I      Zürich 1+2"

@@ -3,8 +3,6 @@
 from collections import defaultdict
 from datetime import datetime
 import re
-import warnings
-import muzzle
 from flatten_dict import flatten
 from . import errors
 
@@ -143,7 +141,7 @@ class SearchResponse(Response):
                 dict_namespaces[v] = None
         return dict_namespaces
 
-    def _clean_dict(self, records):
+    def _clean_dict(self, records):  # noqa
         # remove namespace and make everything lowercase
         def clean_name(key):
             ns_pattern = re.compile("^.+:")

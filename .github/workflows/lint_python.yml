@@ -2,7 +2,7 @@ name: Tests + Linting Python
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [main]
 jobs:
   lint_python:
     runs-on: ubuntu-latest

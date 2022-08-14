@@ -4,14 +4,22 @@ from collections import defaultdict
 from datetime import datetime
 import re
 from flatten_dict import flatten
+import muzzle
 from . import errors
 
 
 class Response(object):
-    def __init__(self, data_loader, xmlparser):
+    def __init__(self, data_loader, index):
         self.data_loader = data_loader
-        self.xmlparser = xmlparser
+        self.index = index
         self.records = []
+
+        namespaces = {
+            "sd": "http://www.cmiag.ch/cdws/searchDetailResponse",
+            "xsd": "http://www.w3.org/2001/XMLSchema",
+        }
+        self.xmlparser = muzzle.XMLParser(namespaces)
+
         xml = self.data_loader.load()
         self._parse_content(xml)
 
@@ -21,93 +29,15 @@ class Response(object):
         except (ValueError, TypeError):
             return s
 
-
-class SearchResponse(Response):
-    def __repr__(self):
-        try:
-            return f"SearcheResponse(count={self.count})"
-        except AttributeError:
-            return "SearchRetrieveResponse(empty)"
-
-    def _parse_content(self, xml):
-        self.index = xml.attrib["indexName"]
-        self.count = self.maybe_int(xml.attrib["numHits"])
-        self.query = xml.attrib["q"]
-        self.maximum_records = self.maybe_int(xml.attrib["m"])
-        self.start_record = self.maybe_int(xml.attrib["s"])
-        self.next_start_record = self.start_record + self.maximum_records
-        self._extract_records(xml)
-
-    def __length_hint__(self):
-        return self.count
-
-    def __iter__(self):
-        # use while loop since self.records could grow while iterating
-        i = 0
-        while True:
-            # load new data when near end
-            if i == len(self.records):
-                try:
-                    self._load_new_data()
-                except errors.NoMoreRecordsError:
-                    break
-            yield self.records[i]
-            i += 1
-
-    def __getitem__(self, key):
-        if isinstance(key, slice):
-            limit = max(key.start or 0, key.stop or self.count)
-            self._load_new_data_until(limit)
-            count = len(self.records)
-            return [self.records[k] for k in range(*key.indices(count))]
-
-        if not isinstance(key, int):
-            raise TypeError("Index must be an integer or slice")
-
-        limit = key
-        if limit < 0:
-            # if we get a negative index, load all data
-            limit = self.count
-        self._load_new_data_until(limit)
-        return self.records[key]
-
-    def _load_new_data_until(self, limit):
-        while limit >= len(self.records):
-            try:
-                self._load_new_data()
-            except errors.NoMoreRecordsError:
-                break
-
-    def _load_new_data(self):
-        if self.next_start_record > self.count:
-            raise errors.NoMoreRecordsError()
-        xml = self.data_loader.load(s=self.next_start_record)
-        self._parse_content(xml)
-
-    def _extract_records(self, xml):
-        new_records = []
-
-        xml_recs = self.xmlparser.findall(xml, "./sd:Hit")
-        for xml_rec in xml_recs:
-            record = defaultdict()
-            guid = xml_rec.attrib["Guid"]
-
-            rec = self.xmlparser.find(xml_rec, f"./*[@OBJ_GUID = '{guid}']")
-            record.update(self._tag_data(rec))
-
-            record = dict(record)
-            new_records.append(record)
-        self.records.extend(new_records)
-
     def _tag_data(self, elem):
         if not elem:
-            return None
+            return {}
         dict_namespaces = self._get_xmlns(elem)
         record_data = self.xmlparser.todict(
             elem, xml_attribs=True, namespaces=dict_namespaces
         )
         if not record_data:
-            return None
+            return {}
 
         # check if there is only one element on the top level
         keys = list(record_data.keys())
@@ -183,3 +113,113 @@ class SearchResponse(Response):
                 clean_rec[clean_k] = v
 
         return clean_rec
+
+
+class SearchResponse(Response):
+    def __repr__(self):
+        try:
+            return f"SearchResponse(index={self.index}, count={self.count}, next_start_record={self.next_start_record})"
+        except AttributeError:
+            return "SearchResponse(empty)"
+
+    def _parse_content(self, xml_str):
+        xml = self.xmlparser.parse(xml_str)
+        self.index = xml.attrib["indexName"]
+        self.count = self.maybe_int(xml.attrib["numHits"])
+        self.query = xml.attrib["q"]
+        self.maximum_records = self.maybe_int(xml.attrib["m"])
+        self.start_record = self.maybe_int(xml.attrib["s"])
+        self.next_start_record = self.start_record + self.maximum_records
+        if self.next_start_record > self.count:
+            self.next_start_record = None
+        self._extract_records(xml)
+
+    def __length_hint__(self):
+        return self.count
+
+    def __iter__(self):
+        # use while loop since self.records could grow while iterating
+        i = 0
+        while True:
+            # load new data when near end
+            if i == len(self.records):
+                try:
+                    self._load_new_data()
+                except errors.NoMoreRecordsError:
+                    break
+            yield self.records[i]
+            i += 1
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            limit = max(key.start or 0, key.stop or self.count)
+            self._load_new_data_until(limit)
+            count = len(self.records)
+            return [self.records[k] for k in range(*key.indices(count))]
+
+        if not isinstance(key, int):
+            raise TypeError("Index must be an integer or slice")
+
+        limit = key
+        if limit < 0:
+            # if we get a negative index, load all data
+            limit = self.count
+        self._load_new_data_until(limit)
+        return self.records[key]
+
+    def _load_new_data_until(self, limit):
+        while limit >= len(self.records):
+            try:
+                self._load_new_data()
+            except errors.NoMoreRecordsError:
+                break
+
+    def _load_new_data(self):
+        if self.next_start_record is None:
+            raise errors.NoMoreRecordsError()
+        xml = self.data_loader.load(s=self.next_start_record)
+        self._parse_content(xml)
+
+    def _extract_records(self, xml):
+        new_records = []
+
+        xml_recs = self.xmlparser.findall(xml, "./sd:Hit")
+        for xml_rec in xml_recs:
+            record = defaultdict()
+            guid = xml_rec.attrib["Guid"]
+
+            rec = self.xmlparser.find(xml_rec, f"./*[@OBJ_GUID = '{guid}']")
+            record.update(self._tag_data(rec))
+
+            record = dict(record)
+            new_records.append(record)
+        self.records.extend(new_records)
+
+
+class SchemaResponse(Response):
+    def __repr__(self):
+        try:
+            return f"SchemaResponse(index={self.index})"
+        except AttributeError:
+            return "SchemaResponse(empty)"
+
+    def _parse_content(self, xml_str):
+        xml = self.xmlparser.parse(xml_str)
+        record = defaultdict()
+        record.update(self._tag_data(xml))
+        record = dict(record)
+        self.records = [record]
+
+    def __iter__(self):
+        for record in self.records:
+            yield record
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            count = len(self.records)
+            return [self.records[k] for k in range(*key.indices(count))]
+
+        if not isinstance(key, int):
+            raise TypeError("Index must be an integer or slice")
+
+        return self.records[key]

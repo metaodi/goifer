@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import requests
-import muzzle
 import yaml
 import os
 from . import errors
@@ -14,12 +13,10 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 class Client(object):
     def __init__(self, instance, maximum_records=10, session=None, config=None):
         self.maximum_records = maximum_records
-        self.session = session
-
-        namespaces = {
-            "sd": "http://www.cmiag.ch/cdws/searchDetailResponse",
-        }
-        self.xmlparser = muzzle.XMLParser(namespaces)
+        if session:
+            self.session = session
+        else:
+            self.session = requests.Session()
 
         if isinstance(config, dict):
             full_config = config
@@ -38,7 +35,7 @@ class Client(object):
         with open(path, "r") as f:
             return yaml.safe_load(f)
 
-    def search(self, index, query, start_record=1):
+    def search(self, index, query="seq > 0", start_record=1):
         index_url = self._get_index_url(index)
         url = f"{index_url}/searchdetails"
         params = {
@@ -47,11 +44,18 @@ class Client(object):
             "m": self.maximum_records,
         }
 
-        data_loader = DataLoader(url, params, self.xmlparser, self.session)
-        return response.SearchResponse(data_loader, self.xmlparser)
+        data_loader = DataLoader(url, params, self.session)
+        return response.SearchResponse(data_loader, index)
 
     def get_indexes(self):
         return list(self.config["indexes"].keys())
+
+    def get_schema(self, index):
+        index_url = self._get_index_url(index)
+        url = f"{index_url}/schema"
+        params = {}
+        data_loader = DataLoader(url, params, self.session)
+        return response.SchemaResponse(data_loader, index)[0]
 
     def _get_index_url(self, index):
         try:
@@ -70,14 +74,10 @@ class Client(object):
 
 
 class DataLoader(object):
-    def __init__(self, url, params, xmlparser, session=None):
-        if session:
-            self.session = session
-        else:
-            self.session = requests.Session()
+    def __init__(self, url, params, session):
         self.url = url
         self.params = params
-        self.xmlparser = xmlparser
+        self.session = session
         self.response = None
 
     def load(self, **kwargs):
@@ -93,4 +93,4 @@ class DataLoader(object):
             raise errors.GoiferError("HTTP error: %s" % e)
         except requests.exceptions.RequestException as e:
             raise errors.GoiferError("Request error: %s" % e)
-        return self.xmlparser.parse(res.content)
+        return res.content

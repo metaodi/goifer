@@ -8,11 +8,10 @@ from .errors import GoiferWarning  # noqa
 from .client import Client  # noqa
 
 
-def search(instance, index, query, **kwargs):
+def search(instance, index, **kwargs):
     search_params = ["index", "query", "start_record"]
     search_kwargs = {k: v for k, v in kwargs.items() if k in search_params}
     search_kwargs["index"] = index
-    search_kwargs["query"] = query
 
     # assume all others kwargs are for the client
     client_kwargs = {k: v for k, v in kwargs.items() if k not in search_params}

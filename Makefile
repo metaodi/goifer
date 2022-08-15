@@ -7,6 +7,8 @@ coverage:  ## Run tests with coverage
 	python -m coverage report -m
 
 deps:  ## Install dependencies
+        python -m pip install --upgrade pip
+        python -m pip install flit
 	python -m flit install -s
 
 lint:  ## Linting of source code

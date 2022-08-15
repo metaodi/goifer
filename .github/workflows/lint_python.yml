@@ -21,8 +21,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        make ci
-
-    - run: ./validate.sh
+      run: make deps
+        
+    - run: make ci

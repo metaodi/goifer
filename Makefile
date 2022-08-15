@@ -21,6 +21,8 @@ format: ## Format code using the code formatter
 test:  ## Run tests
 	python -m pytest --cov=goifer tests/
 
+ci: lint test  # Validate package with CI/CD
+
 help: SHELL := /bin/bash
 help: ## Show help message
 	@IFS=$$'\n' ; \

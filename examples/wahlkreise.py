@@ -3,11 +3,10 @@ from pprint import pprint
 
 records = goifer.search(
     "canton_zurich",
-    index="wahlkreise",
+    index="Wahlkreise",
     query="inaktiv = false sortBy name/sort.ascending",
 )
 print("")
 
-for record in records:
-    pprint(record)
-    print("")
+all_records = [r for r in records]
+pprint(all_records)

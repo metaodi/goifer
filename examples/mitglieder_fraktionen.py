@@ -22,18 +22,15 @@ client = goifer.Client("canton_zurich")
 factions = client.search("Behoerden", query="GremiumTyp adj Fraktion")
 
 for faction in factions:
-    print_title(f"Fraktion: {faction['name']}")
+    print_header(f"Fraktion: {faction['name']}")
     dump(faction)
 
     # get members of faction
-    print_header("Mitglieder:")
+    print_title("Mitglieder:")
     members = client.search(
         "Mitglieder",
         query=f"dauer_end >= \"2020-11-19 00:00:00\" and dauer_start <= \"2020-11-19 00:00:00\" and gremium adj {faction['kurzname']} sortBy name/sort.ascending vorname/sort.ascending",
     )
-    contacts = [m["person"]["kontakt"] for m in members]
-    name_members = [
-        f"{' '.join([m['name'], m['vorname'] or '']).strip()} ({m['ort']})"
-        for m in contacts
-    ]
+
+    name_members = [f"{m['name']}, {m['vorname'] or ''} ({m['ort']})" for m in members]
     dump(name_members)

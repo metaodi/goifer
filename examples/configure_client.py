@@ -1,14 +1,17 @@
-from goifer import GoiferClient
+import goifer
+import requests
+from pprint import pprint
 
-# create a new client and call explain()
-config = {}
-client = GoiferClient(config=config)
+# sometime is't necessary to tweak the requests Session (e.g. to provide authentication, set a custom header or disable SSL verification). For this purpose a customized session can be passed to the Client
 
-# get records for query
-records = client.search(query="Zürich")
+session = requests.Session()
+session.verify = False # disable SSL verification
 
-# display 5 records
-print("")
-print("First 5 results for `Zürich`")
-for r in records[:5]:
-    print("* ", r["title"])
+client = goifer.Client("canton_zurich", maximum_records=1000, session=session)
+records = client.search(
+    index="Ablaufschritte",
+    query="seq>2075771"
+)
+
+print(records)
+pprint(records[0])

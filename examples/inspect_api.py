@@ -19,7 +19,7 @@ def dump(d):
 client = goifer.Client("canton_zurich")
 
 print_title("Indexes:")
-indexes = client.get_indexes()
+indexes = client.indexes()
 dump(indexes)
 
 # loop over all indexes
@@ -28,7 +28,6 @@ for index in indexes:
     records = client.search(index, query="seq > 0")
     print("")
 
-    # print first 3 records of each index
-    for record in records[:3]:
-        dump(record)
-        print("")
+    # print first record of each index
+    dump(records[0])
+    print("")

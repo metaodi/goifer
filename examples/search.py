@@ -3,7 +3,7 @@ from pprint import pprint
 
 records = goifer.search(
     "canton_zurich",
-    index="behoerden",
+    index="Behoerden",
     query="Gremiumtyp adj Fraktion sortBy name/sort.ascending",
 )
 print("")

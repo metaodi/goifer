@@ -32,36 +32,58 @@ See the [`examples` directory](https://github.com/metaodi/goifer/tree/master/exa
 
 ### `search`
 
+`search` is used to query an index (i.e. entity) and get results.
+
 ```python
 >>> import goifer
->>> records = goifer.search('canton_zurich', index='Mitglieder' query='Marti')
->>> print(records)
-SearchResponse(count=17,next_start_record=11)
->>> print(records.count)
-4
+>>> result = goifer.search("canton_zurich", index="Wahlkreise", query="seq > 0")
+>>> print(result)
+SearchResponse(count=18, next_start_record=11)
+>>> print(result.count)
+18
+>>> print(result[0])
+{'obj_guid': '99221ca914ae43ab99935379dd4be037', 'seq': '2242327', 'idx': 'Wahlkreise', 'name': 'XIII Pfäffikon', 'nil': False, 'inaktiv': False}
 ```
 
-
-```
-import goifer
-
-api = "https://parlzhcdws.cmicloud.ch/parlzh2/cdws/Index/"
-api = "https://www.integ.gemeinderat-zuerich.ch/api"
-
-
-
-goifer.get_indexes()[:5]
-file = goifer.get_file(id="123asdasd")
-result = goifer.search(index="Geschaeft", cql="
-```
-
-The return value of `search` is iterable, so you can easily loop over it. Or you can use indices to access elements, e.g. `records[1]` to get the second elemenet, or `records[-1]` to get the last one.
+The return value of `search` is iterable, so you can easily loop over it.
+Or you can use indices to access elements, e.g. `result[1]` to get the second element, or `result[-1]` to get the last one.
 
 Even [slicing](https://python-reference.readthedocs.io/en/latest/docs/brackets/slicing.html) is supported, so you can do things like only iterate over the first 5 elements using
 
 ```python
 for records in records[:5]:
    print(record)
+```
+
+### `indexes`
+
+To get a better idea of the available indexes, you can get all configured indexes with `get_indexes`:
+
+```
+>>> goifer.indexes('canton_zurich')
+['Behoerden', 'SitzungenDetail', 'Geschaeft', 'Mitglieder', 'Parteien', 'Wahlkreise', 'Direktion', 'Geschaeftsart', 'Gremiumtyp', 'Krversand', 'Ablaufschritt']
+```
+
+### `file`
+
+Sometimes the API returns a reference to a document (called `edokument` or `edocument`).
+`goifer` generates a download URL for those documents:
+
+```
+>>> meetings = goifer.search("canton_zurich", "SitzungenDetail", "seq>0")
+>>> meetings[0]['dokument']['edokument']
+{'id': '9db1203429e04a39a233e56eab42feea-332', 'filename': '63. KR-Protokoll vom 9.7.2012, Nachmittag.pdf', 'version': {'nr': '1', 'rendition': {'extension': 'pdf', 'ansicht': 'PDF'}}, 'download_url': 'https://parlzhcdws.cmicloud.ch/parlzh3/cdws/Files/9db1203429e04a39a233e56eab42feea-332/1/PDF'}
+```
+
+The `download_url` can be used to download the file, the corresponding filename is in the `filename` field.
+
+### `schema`
+
+To know what fields are in a search result or to check with fields are available for queries (i.e. `searchfields`), use the `schema` method:
+
+```
+>>> s = goifer.schema('canton_zurich', 'Wahlkreise')
+{'targetnamespace': 'http://www.cmiag.ch/cdws/Wahlkreise', 'elementformdefault': 'qualified', 'annotation': {'documentation': {'searchfield': [{'type': 'SearchFieldBoolean', 'Name': 'inaktiv', 'BoostFactor': '1', 'Nrs': '6'}, {'type': 'SearchFieldText', 'Name': 'Name', 'BoostFactor': '1', 'Nrs': '5'}]}}, 'complextype': {'name': 'Wahlkreis', 'sequence': {'element': [{'name': 'Name', 'type': 'xsd:string'}, {'name': 'inaktiv', 'type': 'xsd:boolean', 'nillable': 'true'}]}, 'attribute': [{'name': 'OBJ_GUID', 'type': 'xsd:string', 'use': 'required'}, {'name': 'SEQ', 'type': 'xsd:string', 'use': 'optional'}, {'name': 'IDX', 'type': 'xsd:string', 'use': 'optional'}]}, 'element': {'name': 'Wahlkreis', 'type': 'Wahlkreis'}}
 ```
 
 ## Development

@@ -6,7 +6,7 @@ canton_zurich:
     Behoerden:
       section: parlzh2
       path: /cdws/Index/BEHOERDEN
-    Sitzungsdetail:
+    SitzungenDetail:
       section: parlzh3
       path: /cdws/Index/SITZUNGENDETAIL
     Geschaeft:
@@ -30,10 +30,10 @@ canton_zurich:
     Gremiumtyp:
       section: parlzh3
       path: /cdws/Index/GREMIUMTYP
-    Krversand:
+    KRVersand:
       section: parlzh1
       path: /cdws/Index/KRVERSAND
-    Ablaufschritt:
+    Ablaufschritte:
       section: parlzh5
       path: /cdws/Index/ABLAUFSCHRITTE
         

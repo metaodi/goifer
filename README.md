@@ -28,7 +28,7 @@ $ pip install goifer
 
 ## Usage
 
-See the [`examples` directory](https://github.com/metaodi/goifer/tree/master/examples) for more scripts.
+See the [`examples` directory](https://github.com/metaodi/goifer/tree/main/examples) for more scripts.
 
 ### `search`
 
@@ -57,16 +57,16 @@ for records in records[:5]:
 
 ### `indexes`
 
-To get a better idea of the available indexes, you can get all configured indexes with `get_indexes`:
+To get a better idea of the available indexes, you can get all configured indexes with `indexes`:
 
 ```
 >>> goifer.indexes('canton_zurich')
-['Behoerden', 'SitzungenDetail', 'Geschaeft', 'Mitglieder', 'Parteien', 'Wahlkreise', 'Direktion', 'Geschaeftsart', 'Gremiumtyp', 'Krversand', 'Ablaufschritt']
+['Behoerden', 'SitzungenDetail', 'Geschaeft', 'Mitglieder', 'Parteien', 'Wahlkreise', 'Direktion', 'Geschaeftsart', 'Gremiumtyp', 'KRVersand', 'Ablaufschritt']
 ```
 
 ### `file`
 
-Sometimes the API returns a reference to a document (called `edokument` or `edocument`).
+Some indexes return a reference to a document (called `edokument` or `edocument`).
 `goifer` generates a download URL for those documents:
 
 ```

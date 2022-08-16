@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.0.3] - 2022-08-16
+### Fixed
+- Include `config.yml` in sdist
+
 ## [0.0.2] - 2022-08-16
 ### Fixed
 - Use `flit` to publish package to PyPI

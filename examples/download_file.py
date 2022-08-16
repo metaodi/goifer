@@ -13,14 +13,14 @@ versand = records[0]
 pprint(versand)
 
 # download the file
-for pos in versand['position']:
-    if not isinstance(pos['dokument'], list):
-        pos['dokument'] = [pos['dokument']]
-    for doc in pos['dokument']:
-        edoc = doc['edocument']
-        download_path = os.path.join('.', edoc['filename'])
-        r = requests.get(edoc['download_url'])
+for pos in versand["position"]:
+    if not isinstance(pos["dokument"], list):
+        pos["dokument"] = [pos["dokument"]]
+    for doc in pos["dokument"]:
+        edoc = doc["edocument"]
+        download_path = os.path.join(".", edoc["filename"])
+        r = requests.get(edoc["download_url"])
         print(f"Download file {edoc['filename']}...")
-        with open(download_path, 'wb') as f:
+        with open(download_path, "wb") as f:
             for chunk in r.iter_content(1024):
                 f.write(chunk)

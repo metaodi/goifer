@@ -16,5 +16,7 @@ print("")
 # if more data is needed, it is lazy loaded when needed
 for record in records:
     print(f"Next start record: {records.next_start_record}")
-    print(f"Datum: {record['datum_start'].strftime('%d.%m.%Y')}, Titel: {record['titel']}")
+    print(
+        f"Datum: {record['datum_start'].strftime('%d.%m.%Y')}, Titel: {record['titel']}"
+    )
     print("")

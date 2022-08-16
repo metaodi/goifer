@@ -38,7 +38,7 @@ class Response(object):
         )
         if not record_data:
             return {}
-        record_data.pop('xmlns', None)
+        record_data.pop("xmlns", None)
 
         record_data = self._add_download_to_docs(record_data)
 
@@ -52,10 +52,10 @@ class Response(object):
 
     def _add_download_to_docs(self, rec):
         new_rec = {}
-        doc_pattern = re.compile('eDo(c|k)ument')
+        doc_pattern = re.compile("eDo(c|k)ument")
         for k, v in rec.items():
             if doc_pattern.match(k) and isinstance(v, dict):
-                v['download_url'], v['FileName'] = self._get_download_url(v)
+                v["download_url"], v["FileName"] = self._get_download_url(v)
                 new_rec[k] = v
             elif isinstance(v, list):
                 new_rec[k] = [self._add_download_to_docs(vi) for vi in v]
@@ -67,20 +67,20 @@ class Response(object):
 
     def _get_download_url(self, doc):
         try:
-            latest_version = doc['Version'][-1]
+            latest_version = doc["Version"][-1]
         except KeyError:
-            latest_version = doc['Version']
-        view = latest_version['Rendition']['Ansicht']
-        ext = latest_version['Rendition']['Extension']
+            latest_version = doc["Version"]
+        view = latest_version["Rendition"]["Ansicht"]
+        ext = latest_version["Rendition"]["Extension"]
         filename = f"{doc['FileName']}.{ext}"
-        version = latest_version['Nr']
+        version = latest_version["Nr"]
         file_id = doc["ID"]
-        index_config = self.config['indexes'][self.index]
-                
-        if 'section' in index_config:
+        index_config = self.config["indexes"][self.index]
+
+        if "section" in index_config:
             path = f"/{index_config['section']}{self.config['files_api']['path']}"
         else:
-            path = self.config['files_api']['path']
+            path = self.config["files_api"]["path"]
         url = f"{self.config['api_base']}{path}/{file_id}/{version}/{view}"
         return (url, filename)
 
@@ -96,12 +96,14 @@ class Response(object):
         flat_data = self._clean_dict(flat_data)
 
         # make some special cases more flat
-        for k in ['person_kontakt', 'position', 'geschaeft']:
+        for k in ["person_kontakt", "position", "geschaeft"]:
             if k in flat_data and isinstance(flat_data[k], list):
                 flat_list = [self._flat_dict(ik) for ik in flat_data[k]]
                 flat_data[k] = flat_list
             elif k in flat_data and isinstance(flat_data[k], dict):
-                flat_data.update(flatten(flat_data[k], max_flatten_depth=2, reducer=leaf_reducer))
+                flat_data.update(
+                    flatten(flat_data[k], max_flatten_depth=2, reducer=leaf_reducer)
+                )
                 del flat_data[k]
 
         return flat_data

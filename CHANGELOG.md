@@ -31,7 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
 [Unreleased]: https://github.com/metaodi/goifer/compare/v0.0.4...HEAD
-[0.0.4]: https://github.com/metaodi/goifer/compare/v0.0.3...0.0.4
-[0.0.3]: https://github.com/metaodi/goifer/compare/v0.0.2...0.0.3
-[0.0.2]: https://github.com/metaodi/goifer/compare/v0.0.1...0.0.2
+[0.0.4]: https://github.com/metaodi/goifer/compare/v0.0.3...v0.0.4
+[0.0.3]: https://github.com/metaodi/goifer/compare/v0.0.2...v0.0.3
+[0.0.2]: https://github.com/metaodi/goifer/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/metaodi/goifer/releases/tag/v0.0.1

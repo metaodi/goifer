@@ -1,6 +1,6 @@
 """Client for Gever of the canton of Zurich"""
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __all__ = ["client", "errors", "response"]
 
 from .errors import GoiferError, NoMoreRecordsError  # noqa

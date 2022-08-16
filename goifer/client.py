@@ -11,7 +11,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 
 
 class Client(object):
-    def __init__(self, instance, maximum_records=10, session=None, config=None):
+    def __init__(self, instance, maximum_records=500, session=None, config=None):
         self.maximum_records = maximum_records
         if session:
             self.session = session
@@ -45,17 +45,17 @@ class Client(object):
         }
 
         data_loader = DataLoader(url, params, self.session)
-        return response.SearchResponse(data_loader, index)
+        return response.SearchResponse(data_loader, index, self.config)
 
-    def get_indexes(self):
+    def indexes(self):
         return list(self.config["indexes"].keys())
 
-    def get_schema(self, index):
+    def schema(self, index):
         index_url = self._get_index_url(index)
         url = f"{index_url}/schema"
         params = {}
         data_loader = DataLoader(url, params, self.session)
-        return response.SchemaResponse(data_loader, index)[0]
+        return response.SchemaResponse(data_loader, index, self.config)[0]
 
     def _get_index_url(self, index):
         try:

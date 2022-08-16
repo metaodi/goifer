@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from collections import defaultdict
 from datetime import datetime
 import re
@@ -9,16 +8,17 @@ from . import errors
 
 
 class Response(object):
-    def __init__(self, data_loader, index):
+    def __init__(self, data_loader, index, config):
         self.data_loader = data_loader
         self.index = index
+        self.config = config
         self.records = []
 
-        namespaces = {
+        self.namespaces = {
             "sd": "http://www.cmiag.ch/cdws/searchDetailResponse",
             "xsd": "http://www.w3.org/2001/XMLSchema",
         }
-        self.xmlparser = muzzle.XMLParser(namespaces)
+        self.xmlparser = muzzle.XMLParser(self.namespaces)
 
         xml = self.data_loader.load()
         self._parse_content(xml)
@@ -38,30 +38,73 @@ class Response(object):
         )
         if not record_data:
             return {}
+        record_data.pop('xmlns', None)
+
+        record_data = self._add_download_to_docs(record_data)
 
         # check if there is only one element on the top level
         keys = list(record_data.keys())
         if len(record_data) == 1 and len(keys) > 0 and len(record_data[keys[0]]) > 0:
             record_data = record_data[keys[0]]
 
-        record_data.pop("xmlns", None)
+        record_data = self._flat_dict(record_data)
+        return record_data
 
+    def _add_download_to_docs(self, rec):
+        new_rec = {}
+        doc_pattern = re.compile('eDo(c|k)ument')
+        for k, v in rec.items():
+            if doc_pattern.match(k) and isinstance(v, dict):
+                v['download_url'], v['FileName'] = self._get_download_url(v)
+                new_rec[k] = v
+            elif isinstance(v, list):
+                new_rec[k] = [self._add_download_to_docs(vi) for vi in v]
+            elif isinstance(v, dict):
+                new_rec[k] = self._add_download_to_docs(v)
+            else:
+                new_rec[k] = v
+        return new_rec
+
+    def _get_download_url(self, doc):
+        try:
+            latest_version = doc['Version'][-1]
+        except KeyError:
+            latest_version = doc['Version']
+        view = latest_version['Rendition']['Ansicht']
+        ext = latest_version['Rendition']['Extension']
+        filename = f"{doc['FileName']}.{ext}"
+        version = latest_version['Nr']
+        file_id = doc["ID"]
+        index_config = self.config['indexes'][self.index]
+                
+        if 'section' in index_config:
+            path = f"/{index_config['section']}{self.config['files_api']['path']}"
+        else:
+            path = self.config['files_api']['path']
+        url = f"{self.config['api_base']}{path}/{file_id}/{version}/{view}"
+        return (url, filename)
+
+    def _flat_dict(self, d):
         def leaf_reducer(k1, k2):
-            # only use key of leaf element
+            if k1 is None or k2.lower() in k1.lower():
+                return k2
             if k2 == "text":
                 return k1
-            return k2
+            return f"{k1}_{k2}"
 
-        try:
-            record_data = flatten(record_data, reducer=leaf_reducer)
-        except ValueError:
-            # if the keys of the leaf elements are not unique
-            # the dict will not be flattened
-            pass
+        flat_data = flatten(d, max_flatten_depth=2, reducer=leaf_reducer)
+        flat_data = self._clean_dict(flat_data)
 
-        record_data = self._clean_dict(record_data)
+        # make some special cases more flat
+        for k in ['person_kontakt', 'position', 'geschaeft']:
+            if k in flat_data and isinstance(flat_data[k], list):
+                flat_list = [self._flat_dict(ik) for ik in flat_data[k]]
+                flat_data[k] = flat_list
+            elif k in flat_data and isinstance(flat_data[k], dict):
+                flat_data.update(flatten(flat_data[k], max_flatten_depth=2, reducer=leaf_reducer))
+                del flat_data[k]
 
-        return record_data
+        return flat_data
 
     def _get_xmlns(self, elem):
         dict_namespaces = {}
@@ -97,6 +140,8 @@ class Response(object):
         # replace nil/text leafs
         clean_rec = {}
         for k, v in records.items():
+            if k.startswith("xmlns"):
+                continue
             clean_k = clean_name(k)
             if isinstance(v, dict):
                 if "nil" in v and "text" in v:
@@ -107,6 +152,8 @@ class Response(object):
                         clean_rec[clean_k] = convert_value(v["text"])
                         continue
                 clean_rec[clean_k] = self._clean_dict(v)
+            elif isinstance(v, list) and len(v) > 0 and isinstance(v[0], dict):
+                clean_rec[clean_k] = [self._clean_dict(vi) for vi in v]
             elif isinstance(v, str):
                 clean_rec[clean_k] = convert_value(v)
             else:
@@ -118,7 +165,7 @@ class Response(object):
 class SearchResponse(Response):
     def __repr__(self):
         try:
-            return f"SearchResponse(index={self.index}, count={self.count}, next_start_record={self.next_start_record})"
+            return f"SearchResponse(index={self.index}, count={self.count}, maximum_records={self.maximum_records}, next_start_record={self.next_start_record})"
         except AttributeError:
             return "SearchResponse(empty)"
 

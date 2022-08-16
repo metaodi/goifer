@@ -38,6 +38,3 @@ Home = "https://github.com/metaodi/goifer"
 [tool.black]
 line-length = 88
 extend-exclude = '(pyenv)'
-
-[tool.flit.sdist]
-include = ["config.yml"]

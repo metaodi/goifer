@@ -24,7 +24,7 @@ class Client(object):
             full_config = self._load_yaml_file(config)
         else:
             # if no config is provided, load the default config
-            path = os.path.join(__location__, "..", "config.yml")
+            path = os.path.join(__location__, "config.yml")
             full_config = self._load_yaml_file(path)
         try:
             self.config = full_config[instance]

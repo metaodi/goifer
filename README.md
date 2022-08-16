@@ -64,7 +64,7 @@ To get a better idea of the available indexes, you can get all configured indexe
 ['Behoerden', 'SitzungenDetail', 'Geschaeft', 'Mitglieder', 'Parteien', 'Wahlkreise', 'Direktion', 'Geschaeftsart', 'Gremiumtyp', 'KRVersand', 'Ablaufschritt']
 ```
 
-### `file`
+### File download
 
 Some indexes return a reference to a document (called `edokument` or `edocument`).
 `goifer` generates a download URL for those documents:

@@ -10,9 +10,9 @@ class TestClient:
         return fixture_content("wahlkreise.xml")
 
     @responses.activate
-    def test_get_indexes(self):
+    def test_indexes(self):
         client = Client("canton_zurich")
-        indexes = client.get_indexes()
+        indexes = client.indexes()
         assert isinstance(indexes, list), "indexes is not a list"
         assert len(indexes) == 11
 

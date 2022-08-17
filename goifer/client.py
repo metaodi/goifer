@@ -50,7 +50,7 @@ class Client(object):
         data_loader = DataLoader(url, params, self.session)
         return response.SearchResponse(data_loader, index, self.config)
 
-    def file(self, index, file_id, version, view)
+    def file(self, index, file_id, version, view):
         index_config = self.config["indexes"][index]
 
         if "section" in index_config:

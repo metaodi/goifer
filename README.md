@@ -59,7 +59,7 @@ for records in records[:5]:
 
 To get a better idea of the available indexes, you can get all configured indexes with `indexes`:
 
-```
+```python
 >>> goifer.indexes('canton_zurich')
 ['Behoerden', 'SitzungenDetail', 'Geschaeft', 'Mitglieder', 'Parteien', 'Wahlkreise', 'Direktion', 'Geschaeftsart', 'Gremiumtyp', 'KRVersand', 'Ablaufschritt']
 ```
@@ -69,7 +69,7 @@ To get a better idea of the available indexes, you can get all configured indexe
 Some indexes return a reference to a document (called `edokument` or `edocument`).
 `goifer` generates a download URL for those documents:
 
-```
+```python
 >>> meetings = goifer.search("canton_zurich", "SitzungenDetail", "seq>0")
 >>> meetings[0]['dokument']['edokument']
 {'id': '9db1203429e04a39a233e56eab42feea-332', 'filename': '63. KR-Protokoll vom 9.7.2012, Nachmittag.pdf', 'version': {'nr': '1', 'rendition': {'extension': 'pdf', 'ansicht': 'PDF'}}, 'download_url': 'https://parlzhcdws.cmicloud.ch/parlzh3/cdws/Files/9db1203429e04a39a233e56eab42feea-332/1/PDF'}
@@ -79,7 +79,7 @@ The `download_url` can be used to download the file, the corresponding filename 
 
 Sometimes you want to generate the download URL yourself, in these cases you can use the `file` method:
 
-```
+```python
 >>> import goifer
 >>> client = goifer.client("canton_zurich")
 >>> res = client.search("Mitglieder", "Name adj Marti and Vorname adj Res")[0]
@@ -91,7 +91,7 @@ Sometimes you want to generate the download URL yourself, in these cases you can
 
 To know what fields are in a search result or to check with fields are available for queries (i.e. `searchfields`), use the `schema` method:
 
-```
+```python
 >>> s = goifer.schema('canton_zurich', 'Wahlkreise')
 {'targetnamespace': 'http://www.cmiag.ch/cdws/Wahlkreise', 'elementformdefault': 'qualified', 'annotation': {'documentation': {'searchfield': [{'type': 'SearchFieldBoolean', 'Name': 'inaktiv', 'BoostFactor': '1', 'Nrs': '6'}, {'type': 'SearchFieldText', 'Name': 'Name', 'BoostFactor': '1', 'Nrs': '5'}]}}, 'complextype': {'name': 'Wahlkreis', 'sequence': {'element': [{'name': 'Name', 'type': 'xsd:string'}, {'name': 'inaktiv', 'type': 'xsd:boolean', 'nillable': 'true'}]}, 'attribute': [{'name': 'OBJ_GUID', 'type': 'xsd:string', 'use': 'required'}, {'name': 'SEQ', 'type': 'xsd:string', 'use': 'optional'}, {'name': 'IDX', 'type': 'xsd:string', 'use': 'optional'}]}, 'element': {'name': 'Wahlkreis', 'type': 'Wahlkreis'}}
 ```
@@ -100,7 +100,7 @@ To know what fields are in a search result or to check with fields are available
 
 To develop on this project, install `flit`:
 
-```
+```bash
 pip install flit
 flit install -s
 ```

@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## [0.0.5] - 2022-08-17
 ### Added
 - Add `file` method to generate download URLs for files
+- Example code for photo download
+- Jupyter example notebook
 
 ## [0.0.4] - 2022-08-16
 ### Changed

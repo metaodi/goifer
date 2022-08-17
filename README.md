@@ -64,7 +64,7 @@ To get a better idea of the available indexes, you can get all configured indexe
 ['Behoerden', 'SitzungenDetail', 'Geschaeft', 'Mitglieder', 'Parteien', 'Wahlkreise', 'Direktion', 'Geschaeftsart', 'Gremiumtyp', 'KRVersand', 'Ablaufschritt']
 ```
 
-### File download
+### `file`
 
 Some indexes return a reference to a document (called `edokument` or `edocument`).
 `goifer` generates a download URL for those documents:
@@ -76,6 +76,16 @@ Some indexes return a reference to a document (called `edokument` or `edocument`
 ```
 
 The `download_url` can be used to download the file, the corresponding filename is in the `filename` field.
+
+Sometimes you want to generate the download URL yourself, in these cases you can use the `file` method:
+
+```
+>>> import goifer
+>>> client = goifer.client("canton_zurich")
+>>> res = client.search("Mitglieder", "Name adj Marti and Vorname adj Res")[0]
+>>> client.file("Mitglieder", res["foto_id"], res['foto_version']['nr'], 'Original')
+'https://parlzhcdws.cmicloud.ch/parlzh2/cdws/Files/6bf54e3bdd24400d85e13169c3a5bbf8-1664/1/Original'
+```
 
 ### `schema`
 

@@ -35,6 +35,9 @@ class Client(object):
         with open(path, "r") as f:
             return yaml.safe_load(f)
 
+    def indexes(self):
+        return list(self.config["indexes"].keys())
+
     def search(self, index, query="seq > 0", start_record=1):
         index_url = self._get_index_url(index)
         url = f"{index_url}/searchdetails"
@@ -47,8 +50,15 @@ class Client(object):
         data_loader = DataLoader(url, params, self.session)
         return response.SearchResponse(data_loader, index, self.config)
 
-    def indexes(self):
-        return list(self.config["indexes"].keys())
+    def file(self, index, file_id, version, view):
+        index_config = self.config["indexes"][index]
+
+        if "section" in index_config:
+            path = f"/{index_config['section']}{self.config['files_api']['path']}"
+        else:
+            path = self.config["files_api"]["path"]
+        url = f"{self.config['api_base']}{path}/{file_id}/{version}/{view}"
+        return url
 
     def schema(self, index):
         index_url = self._get_index_url(index)

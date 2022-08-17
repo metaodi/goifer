@@ -4,6 +4,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.0.5] - 2022-08-17
+### Added
+- Add `file` method to generate download URLs for files
+- Example code for photo download
+- Jupyter example notebook
+
 ## [0.0.4] - 2022-08-16
 ### Changed
 - Move `config.yml` to goifer directory
@@ -21,7 +27,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Initial release of goifer
 
 
-
 # Categories
 - `Added` for new features.
 - `Changed` for changes in existing functionality.
@@ -30,7 +35,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Fixed` for any bug fixes.
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
-[Unreleased]: https://github.com/metaodi/goifer/compare/v0.0.4...HEAD
+[Unreleased]: https://github.com/metaodi/goifer/compare/v0.0.5...HEAD
+[0.0.5]: https://github.com/metaodi/goifer/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/metaodi/goifer/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/metaodi/goifer/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/metaodi/goifer/compare/v0.0.1...v0.0.2

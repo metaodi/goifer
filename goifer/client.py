@@ -37,7 +37,7 @@ class Client(object):
 
     def indexes(self):
         return list(self.config["indexes"].keys())
-    
+
     def search(self, index, query="seq > 0", start_record=1):
         index_url = self._get_index_url(index)
         url = f"{index_url}/searchdetails"

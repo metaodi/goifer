@@ -4,7 +4,7 @@
 
 <img src="https://user-images.githubusercontent.com/538415/184494773-c5523f26-bb97-405d-8d29-24a916e5978c.jpeg" alt="goifer logo" width="300" />
 
-# goifer
+# goifer 🤤
 
 **goifer** is the glue code needed to extract information from the Gever (Geschäftsverwaltungssystem) of the canton of Zurich.
 It is a client for python to make requests to the [Gever API](https://www.zh.ch/de/politik-staat/opendata.html/details/709@kantonsrat-kanton-zuerich?keyword=ogd#/details/709@fachstelle-ogd-kanton-zuerich).

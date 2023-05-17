@@ -52,7 +52,8 @@ class Response(object):
 
     def _add_download_to_docs(self, rec):
         new_rec = {}
-        doc_pattern = re.compile("eDo(c|k)ument")
+
+        doc_pattern = re.compile("e?Do(c|k)ument$")
         for k, v in rec.items():
             if doc_pattern.match(k) and isinstance(v, dict):
                 v["download_url"], v["FileName"] = self._get_download_url(v)
@@ -66,6 +67,8 @@ class Response(object):
         return new_rec
 
     def _get_download_url(self, doc):
+        from pprint import pprint
+        pprint(doc)
         try:
             latest_version = doc["Version"][-1]
         except KeyError:
@@ -81,7 +84,15 @@ class Response(object):
             path = f"/{index_config['section']}{self.config['files_api']['path']}"
         else:
             path = self.config["files_api"]["path"]
-        url = f"{self.config['api_base']}{path}/{file_id}/{version}/{view}"
+        url = f"{self.config['api_base']}{path}/{file_id}"
+
+        if self.config["files_api"]["version"]:
+            url = f"{url}/{version}"
+        if self.config["files_api"]["view"]:
+            url = f"{url}/{view}"
+        if self.config["files_api"]["extension"]:
+            url = f"{url}/{ext}"
+
         return (url, filename)
 
     def _flat_dict(self, d):
